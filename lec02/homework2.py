@@ -12,13 +12,13 @@ def arithmetic(x, y):
     isinstance(y,str)   return x+y         return str(x)+y
     isinstance(y,float) return x*int(y)    return x*y
     """
-    if isinstance(x,str):
-        if isinstance(y,str):
+    if isinstance(x, str):
+        if isinstance(y, str):
             return x + y
         else: 
-            return strx*int(y)
+            return x * int(y)
     else:  
-        if isinstance(y,str):
-            return str(x)+y
+        if isinstance(y, str):
+            return str(x) + y
         else:
-            return x*y
+            return x * y
