@@ -1,8 +1,9 @@
 import numpy as np
 
+
 def voiced_excitation(duration, F0, Fs):
     '''
-    Create voiced speeech excitation.
+    Create voiced speech excitation.
     
     @param:
     duration (scalar) - length of the excitation, in samples
@@ -14,7 +15,15 @@ def voiced_excitation(duration, F0, Fs):
       excitation[n] = -1 if n is an integer multiple of int(np.round(Fs/F0))
       excitation[n] = 0 otherwise
     '''
-    raise RuntimeError("You need to write this part!")
+
+    period = int(np.round(Fs / F0))
+
+    excitation = np.zeros(duration)
+
+    excitation[::period] = -1
+
+    return excitation
+
 
 def resonator(x, F, BW, Fs):
     '''
@@ -29,9 +38,45 @@ def resonator(x, F, BW, Fs):
     @returns:
     y (np.ndarray(N)) - resonant output
     '''
-    raise RuntimeError("You need to write this part!")
 
-def synthesize_vowel(duration,F0,F1,F2,F3,F4,BW1,BW2,BW3,BW4,Fs):
+    A = -2 * np.exp(
+        -np.pi * BW / Fs
+    ) * np.cos(
+        2 * np.pi * F / Fs
+    )
+
+    B = np.exp(
+        -2 * np.pi * BW / Fs
+    )
+
+    C = 1 + A + B
+
+    y = np.zeros(len(x))
+
+    for n in range(2, len(x)):
+
+        y[n] = (
+            C * x[n]
+            - A * y[n - 1]
+            - B * y[n - 2]
+        )
+
+    return y
+
+
+def synthesize_vowel(
+        duration,
+        F0,
+        F1,
+        F2,
+        F3,
+        F4,
+        BW1,
+        BW2,
+        BW3,
+        BW4,
+        Fs
+    ):
     '''
     Synthesize a vowel.
     
@@ -51,4 +96,39 @@ def synthesize_vowel(duration,F0,F1,F2,F3,F4,BW1,BW2,BW3,BW4,Fs):
     @returns:
     speech (np.ndarray(samples)) - synthesized vowel
     '''
-    raise RuntimeError("You need to write this part!")
+
+    excitation = voiced_excitation(
+        duration,
+        F0,
+        Fs
+    )
+
+    y1 = resonator(
+        excitation,
+        F1,
+        BW1,
+        Fs
+    )
+
+    y2 = resonator(
+        y1,
+        F2,
+        BW2,
+        Fs
+    )
+
+    y3 = resonator(
+        y2,
+        F3,
+        BW3,
+        Fs
+    )
+
+    y4 = resonator(
+        y3,
+        F4,
+        BW4,
+        Fs
+    )
+
+    return y4
